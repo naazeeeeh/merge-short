@@ -1,3 +1,10 @@
+// group project
+// Judul: Analisis
+// anggota kelompok
+// Nazeeh - 103042400055
+// Agung Pratama - 103042400015
+// Kallistus Wahyu Sandivan - 103042400068
+
 package main
 
 import (
@@ -7,13 +14,15 @@ import (
 	"time"
 )
 
-// merge sort rekursif
-func mergeRecursive(U, V []int) []int {
-    h := len(U)
-    m := len(V)
-    S := make([]int, h+m)
+// mergeRekursif menggabungkan array U dan V
+func mergeRekursif(U, V []int) []int {
+	var S []int;
+	var h, m, i, j, k int;
+    h = len(U) // panjang array U
+    m = len(V) // panjang array V
+    S = make([]int, h+m) // array S dengan panjang h+m
 
-    i, j, k := 0, 0, 0
+    i, j, k = 0, 0, 0
     for i < h && j < m {
         if U[i] < V[j] {
             S[k] = U[i]
@@ -37,65 +46,87 @@ func mergeRecursive(U, V []int) []int {
     return S
 }
 
-func mergesortRecursive(S []int) []int {
-    n := len(S)
+func mergesortRekursif(S []int) []int {
+
+	var n, h int;
+	var U, V []int;
+
+    // jika panjang array S hanya 1 atau kurang dari 1,
+    // maka array S sudah terurut
+    n = len(S)
     if n <= 1 {
         return S
     }
-    h := n / 2
-    U := make([]int, h)
-    V := make([]int, n-h)
-    copy(U, S[:h])
-    copy(V, S[h:])
-    U = mergesortRecursive(U)
-    V = mergesortRecursive(V)
-    return mergeRecursive(U, V)
+
+    // membagi array S menjadi 2 bagian
+    h = n / 2
+    U = make([]int, h)
+    V = make([]int, n-h)
+
+    // menyalin U dan V dengan nilai S
+    copy(U, S[:h]) //fungsi GO untuk copy elemen dari array S ke array U
+    copy(V, S[h:]) //copy dari array S ke array V
+
+    // rekursif untuk melakukan merge sort pada U dan V
+    U = mergesortRekursif(U)
+    V = mergesortRekursif(V)
+
+    // menggabungkan U dan V
+    return mergeRekursif(U, V)
 }
 
-// === Merge Sort Iteratif (Bottom-Up) ===
-func mergeIterative(src, dst []int, left, mid, right int) {
-    i, j, k := left, mid, left
-    for i < mid && j < right {
-        if src[i] <= src[j] {
-            dst[k] = src[i]
-            i++
-        } else {
-            dst[k] = src[j]
-            j++
+// mergesort iteratif
+func mergeIteratif(src, dst []int, left, mid, right int) {
+	var i, j, k int;
+    i, j, k = left, mid, left
+    
+    for i < mid && j < right { 
+        if src[i] <= src[j] { 
+            dst[k] = src[i] 
+            i++ 
+        } else { 
+            dst[k] = src[j] 
+            j++ 
         }
-        k++
+        k++ 
     }
+    
     for i < mid {
-        dst[k] = src[i]
-        i++
-        k++
+        dst[k] = src[i] 
+        i++ 
+        k++ 
     }
+    
     for j < right {
-        dst[k] = src[j]
-        j++
-        k++
-    }
+        dst[k] = src[j] 
+        j++ 
+        k++ 
+	}
 }
 
-func mergesortIterative(a []int) []int {
-    n := len(a)
+func mergesortIteratif(a []int) []int {
+
+	var n, width, left, mid, right int;
+	var src, dst []int;
+
+    n = len(a)
     if n <= 1 {
         return append([]int(nil), a...)
     }
-    src := append([]int(nil), a...)
-    dst := make([]int, n)
-    width := 1
+    src = append([]int(nil), a...)
+    dst = make([]int, n)
+    width = 1
     for width < n {
-        for left := 0; left < n; left += 2 * width {
-            mid := left + width
+        for left = 0; left < n; left += 2 * width {
+            mid = left + width
             if mid > n {
                 mid = n
             }
-            right := left + 2*width
+            right = left + 2*width
             if right > n {
                 right = n
             }
-            mergeIterative(src, dst, left, mid, right)
+            mergeIteratif(src, dst, left, mid, right)
         }
         src, dst = dst, src
         width *= 2
@@ -103,17 +134,22 @@ func mergesortIterative(a []int) []int {
     return src
 }
 
-// === Helpers ===
-func genData(n int, rng *rand.Rand) []int {
-    a := make([]int, n)
-    for i := range a {
+// generate data random tidak terurut 
+// untuk dilakukan sorting
+func generateData(n int, rng *rand.Rand) []int {
+	var a []int;
+	var i int;
+
+    a = make([]int, n)
+    for i = range a {
         a[i] = rng.Intn(2_000_000_001) - 1_000_000_000
     }
     return a
 }
 
 func isSorted(a []int) bool {
-    for i := 1; i < len(a); i++ {
+	var i int;
+    for i = 1; i < len(a); i++ {
         if a[i] < a[i-1] {
             return false
         }
@@ -121,21 +157,27 @@ func isSorted(a []int) bool {
     return true
 }
 
+// menghitung rata-rata dari waktu + trials
 func avg(vals []float64) float64 {
-    sum := 0.0
-    for _, v := range vals {
+	var sum, v float64;
+    sum = 0.0
+    for _, v = range vals {
         sum += v
     }
     return sum / float64(len(vals))
 }
 
-func benchmark(name string, sortFn func([]int) []int, sizes []int, trials int, seed int64) [][2]float64 {
-    rng := rand.New(rand.NewSource(seed))
+func eksperimenPerbandingan(name string, sortFn func([]int) []int, sizes []int, trials int, seed int64) [][2]float64 {
+	var rng *rand.Rand;
+	var n, t int;
+	var data []int;
+
+    rng = rand.New(rand.NewSource(seed))
     results := make([][2]float64, 0, len(sizes))
-    for _, n := range sizes {
+    for _, n = range sizes {
         times := make([]float64, 0, trials)
-        for t := 0; t < trials; t++ {
-            data := genData(n, rng)	// generate data untuk dilakukan sort
+        for t = 0; t < trials; t++ {
+            data = generateData(n, rng)	// generate data untuk dilakukan sort
             start := time.Now()
             out := sortFn(data) // algoritma sort yang dipilih untuk dilakukan pengujian
             elapsed := float64(time.Since(start).Milliseconds()) // menentukan waktu yang jenis waktu miliseconds
@@ -157,16 +199,16 @@ func main() {
     seed := int64(42)
 
     // Rekursif dulu
-    resRec := benchmark("Recursive", mergesortRecursive, sizes, trials, seed)
-    fmt.Println("\n=== Hasil Benchmark Merge Sort Rekursif (Top-Down) ===")
+    resRec := eksperimenPerbandingan("Rekursif", mergesortRekursif, sizes, trials, seed)
+    fmt.Println("\nHasil Perbandingan Merge Sort Rekursif")
     fmt.Println("\n  n data   | avg_time (ms)")
     for _, r := range resRec {
         fmt.Printf("n=%-8d | %8.3f ms\n", int(r[0]), r[1])
     }
 
     // Lalu iteratif
-    resIter := benchmark("Iterative", mergesortIterative, sizes, trials, seed)
-    fmt.Println("\n=== Hasil Benchmark Merge Sort Iteratif ===")
+    resIter := eksperimenPerbandingan("Iteratif", mergesortIteratif, sizes, trials, seed)
+    fmt.Println("\nHasil Perbandingan Merge Sort Iteratif")
     fmt.Println("\n  n data   | avg_time (ms)")
 
     for _, r := range resIter {
