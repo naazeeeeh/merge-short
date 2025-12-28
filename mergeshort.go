@@ -51,27 +51,21 @@ func mergesortRekursif(S []int) []int {
 	var n, h int;
 	var U, V []int;
 
-    // jika panjang array S hanya 1 atau kurang dari 1,
-    // maka array S sudah terurut
     n = len(S)
     if n <= 1 {
         return S
     }
 
-    // membagi array S menjadi 2 bagian
     h = n / 2
     U = make([]int, h)
     V = make([]int, n-h)
 
-    // menyalin U dan V dengan nilai S
-    copy(U, S[:h]) //fungsi GO untuk copy elemen dari array S ke array U
-    copy(V, S[h:]) //copy dari array S ke array V
+    copy(U, S[:h]) 
+    copy(V, S[h:]) 
 
-    // rekursif untuk melakukan merge sort pada U dan V
     U = mergesortRekursif(U)
     V = mergesortRekursif(V)
 
-    // menggabungkan U dan V
     return mergeRekursif(U, V)
 }
 
